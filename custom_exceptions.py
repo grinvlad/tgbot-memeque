@@ -1,0 +1,2 @@
+class MemeException(Exception):
+    pass
