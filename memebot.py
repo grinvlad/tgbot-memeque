@@ -80,10 +80,7 @@ async def delete_meme_button(update: Update, _: CallbackContext) -> None:
         ans_msg = str(e)
     # deletes pressed button from markup
     keyboard = query.message.reply_markup.inline_keyboard
-    for i, row_of_inline_keyboards in enumerate(keyboard):
-        inline_keyboard = row_of_inline_keyboards[0]
-        if inline_keyboard.callback_data == query.data:
-            keyboard.pop(i)
+    keyboard = [row for row in keyboard if row[0].callback_data != query.data]
     markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(text=f'{query.message.text}\n{ans_msg}', reply_markup=markup)
 
