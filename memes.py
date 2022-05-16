@@ -64,7 +64,6 @@ def add_meme(file_info: dict[str, Any]) -> Meme:
     return meme
 
 
-@init_que
 def delete_meme_from_db(row_id: int, user_id: int) -> str:
     connection = db.get_connection()
     cursor = connection.cursor()
