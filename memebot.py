@@ -19,7 +19,8 @@ from memes import Meme
 import memes
 
 
-TOKEN = os.getenv('BOT_TOKEN')
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+GROUP_CHAT_ID = os.getenv('GROUP_CHAT_ID')
 
 
 async def get_statistics(update: Update, _: CallbackContext) -> None:
@@ -91,30 +92,38 @@ async def length_button(update: Update, _: CallbackContext) -> None:
     await query.answer(text=ans_msg)
 
 
-async def send_next_meme(update: Update, _: CallbackContext) -> None:
-    chat = update.effective_chat
+async def send_next_meme_privately(_: Update, context: CallbackContext) -> None:
+    await _send_next_meme(int(GROUP_CHAT_ID), context)
+
+
+async def send_next_meme_regularly(update: Update, context: CallbackContext) -> None:
+    await _send_next_meme(update.message.chat_id, context)
+
+
+async def _send_next_meme(chat_id: int, context: CallbackContext) -> None:
+    bot = context.bot
     try:
         meme = memes.get_next_meme()
     except MemeException as e:
-        await chat.send_message(str(e))
+        await bot.send_message(chat_id, str(e))
         return
     send_meme = None
     match meme.meme_type:
         case 'photo':
-            send_meme = chat.send_photo
+            send_meme = bot.send_photo
         case 'video':
-            send_meme = chat.send_video
+            send_meme = bot.send_video
         case 'voice':
-            send_meme = chat.send_voice
+            send_meme = bot.send_voice
         case 'animation':
-            send_meme = chat.send_animation
+            send_meme = bot.send_animation
         case 'video_note':
-            await chat.send_video_note(meme.file_id)
+            await bot.send_video_note(chat_id, meme.file_id)
             return
         case 'text':
-            await chat.send_message(meme.comment)
+            await bot.send_message(chat_id, meme.comment)
             return
-    await send_meme(meme.file_id, caption=meme.comment)
+    await send_meme(chat_id, meme.file_id, caption=meme.comment)
 
 
 async def len_meme_que(update: Update, _: CallbackContext) -> None:
@@ -201,10 +210,11 @@ async def _delete_meme(msg_text: str, user_id: int) -> str:
 
 
 def main() -> None:
-    app = Application.builder().token(TOKEN).build()
+    app = Application.builder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("stats", get_statistics))
     app.add_handler(CommandHandler("length", len_meme_que))
+    app.add_handler(CommandHandler("send_to_group_chat", send_next_meme_privately, filters.ChatType.PRIVATE))
     app.add_handler(MessageHandler(filters.PHOTO & filters.ChatType.PRIVATE, add_photo))
     app.add_handler(MessageHandler(filters.VIDEO & filters.ChatType.PRIVATE, add_video))
     app.add_handler(MessageHandler(filters.VOICE & filters.ChatType.PRIVATE, add_voice))
@@ -212,7 +222,7 @@ def main() -> None:
     app.add_handler(MessageHandler(filters.VIDEO_NOTE & filters.ChatType.PRIVATE, add_video_note))
     app.add_handler(MessageHandler(filters.Regex(r'^/text_meme ?\n.+') & filters.ChatType.PRIVATE, add_text))
     app.add_handler(MessageHandler(filters.Regex(r'^/delfrom(db|que)_\d+$') & filters.ChatType.PRIVATE, delete_meme))
-    app.add_handler(MessageHandler(filters.Regex(r'^[мМ]ем$'), send_next_meme))
+    app.add_handler(MessageHandler(filters.Regex(r'^[мМ]ем$'), send_next_meme_regularly))
     app.add_handler(CallbackQueryHandler(length_button, pattern='/length'))
     app.add_handler(CallbackQueryHandler(delete_meme_button, pattern=r'^/delfrom(db|que)_\d+ | '))
 
