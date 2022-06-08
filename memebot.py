@@ -214,7 +214,7 @@ def main() -> None:
 
     app.add_handler(CommandHandler("stats", get_statistics))
     app.add_handler(CommandHandler("length", len_meme_que))
-    app.add_handler(CommandHandler("send_to_group_chat", send_next_meme_privately, filters.ChatType.PRIVATE))
+    app.add_handler(CommandHandler("send_to_group", send_next_meme_privately, filters.ChatType.PRIVATE))
     app.add_handler(MessageHandler(filters.PHOTO & filters.ChatType.PRIVATE, add_photo))
     app.add_handler(MessageHandler(filters.VIDEO & filters.ChatType.PRIVATE, add_video))
     app.add_handler(MessageHandler(filters.VOICE & filters.ChatType.PRIVATE, add_voice))
