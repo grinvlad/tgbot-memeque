@@ -1,4 +1,5 @@
 *.idea
 *.pyc
 *.db
+*.csv
 venv
