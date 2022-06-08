@@ -19,8 +19,8 @@ from memes import Meme
 import memes
 
 
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-GROUP_CHAT_ID = os.getenv('GROUP_CHAT_ID')
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TELEGRAM_GROUP_CHAT_ID = os.getenv('TELEGRAM_GROUP_CHAT_ID')
 
 
 async def get_statistics(update: Update, _: CallbackContext) -> None:
@@ -93,7 +93,7 @@ async def length_button(update: Update, _: CallbackContext) -> None:
 
 
 async def send_next_meme_privately(_: Update, context: CallbackContext) -> None:
-    await _send_next_meme(int(GROUP_CHAT_ID), context)
+    await _send_next_meme(int(TELEGRAM_GROUP_CHAT_ID), context)
 
 
 async def send_next_meme_regularly(update: Update, context: CallbackContext) -> None:
@@ -210,7 +210,7 @@ async def _delete_meme(msg_text: str, user_id: int) -> str:
 
 
 def main() -> None:
-    app = Application.builder().token(BOT_TOKEN).build()
+    app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("stats", get_statistics))
     app.add_handler(CommandHandler("length", len_meme_que))
