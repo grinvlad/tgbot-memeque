@@ -222,7 +222,7 @@ def main() -> None:
     app.add_handler(MessageHandler(filters.VIDEO_NOTE & filters.ChatType.PRIVATE, add_video_note))
     app.add_handler(MessageHandler(filters.Regex(r'^/text_meme ?\n.+') & filters.ChatType.PRIVATE, add_text))
     app.add_handler(MessageHandler(filters.Regex(r'^/delfrom(db|que)_\d+$') & filters.ChatType.PRIVATE, delete_meme))
-    app.add_handler(MessageHandler(filters.Regex(r'^[мМ]ем$'), send_next_meme_regularly))
+    app.add_handler(MessageHandler(filters.Regex(r'^[мМ]ем$') & ~filters.ChatType.PRIVATE, send_next_meme_regularly))
     app.add_handler(CallbackQueryHandler(length_button, pattern='/length'))
     app.add_handler(CallbackQueryHandler(delete_meme_button, pattern=r'^/delfrom(db|que)_\d+ | '))
 
